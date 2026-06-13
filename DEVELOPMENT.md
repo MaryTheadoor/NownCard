@@ -38,3 +38,32 @@
 - Project: nown-card (ID: 719245905430)
 
 ### Next: Phase 2 — Authentication & User Profile
+
+---
+
+## Session 2 — 2026-06-12: Phase 2 Authentication & User Profile
+
+### Created
+- **Auth feature module** (`src/features/auth/`):
+  - `types/` — SignInFormData, SignUpFormData
+  - `api/` — loginWithEmail, registerWithEmail, loginWithGoogle, logout (thin wrappers around Firebase)
+  - `hooks/` — useSignIn, useSignUp, useGoogleSignIn, useSignOut with toast integration + error handling
+  - `components/SignInForm.tsx` — email/password form with zod validation
+  - `components/SignUpForm.tsx` — name/email/password/confirm form with zod validation
+- **AuthModal widget** (`src/widgets/AuthModal/`) — reusable dialog wrapping SignIn/SignUp forms with Google sign-in
+- **Dialog component** (`src/shared/ui/dialog.tsx`) — Radix-based dialog with overlay, header, title, description
+- **User CRUD** (`src/shared/api/users.ts`) — getUser, ensureUser (auto-create on first sign-in), updateUser
+- **Updated AuthProvider** — now fetches isAdmin + plan from Firestore on auth state change, auto-creates user doc via ensureUser
+- **Updated Navbar** — uses AuthModal instead of plain links; adds sign-out button with LogOut icon
+- **Updated HomePage** — CTA button opens AuthModal if not signed in, navigates to dashboard if signed in
+- **Vitest config** (`vitest.config.ts`) — jsdom environment, v8 coverage with 80% thresholds
+- **Test setup** (`src/test/setup.ts`) — @testing-library/jest-dom matchers
+- **Unit tests** (`features/auth/hooks/index.test.ts`) — 6 tests covering useSignIn, useSignUp, useGoogleSignIn, useSignOut with mocked Firebase + Toast
+
+### Verification
+- `npm run type-check` — zero errors
+- `npm run lint` — zero warnings
+- `npm run test:unit` — 6/6 passed
+- `npm run build` — success, PWA SW regenerated
+
+### Next: Phase 3 — Card CRUD & Dashboard

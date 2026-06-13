@@ -9,3 +9,5 @@ export type {
   Message,
   DailyAnalytics,
 } from "./types";
+
+export { getUser, ensureUser, updateUser } from "./users";

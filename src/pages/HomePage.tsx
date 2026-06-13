@@ -1,8 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
 import { ArrowRight, QrCode, Share2, Download } from "lucide-react";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { AuthModal } from "@/widgets/AuthModal/AuthModal";
+import { useState } from "react";
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const handleCta = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      setAuthModalOpen(true);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <section className="flex flex-col items-center justify-center px-4 py-20 text-center sm:py-32">
@@ -16,10 +31,8 @@ export default function HomePage() {
           required for recipients.
         </p>
         <div className="mt-8 flex gap-4">
-          <Button size="lg" asChild>
-            <Link to="/dashboard">
-              Create Your Card <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+          <Button size="lg" onClick={handleCta}>
+            Create Your Card <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
           <Button size="lg" variant="outline" asChild>
             <Link to="/pricing">View Plans</Link>
@@ -44,6 +57,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </div>
   );
 }

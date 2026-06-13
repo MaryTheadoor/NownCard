@@ -1,53 +1,46 @@
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import { Textarea } from "@/shared/ui/textarea";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { EditorForm } from "@/features/card-editor/components/EditorForm";
+import { useCardEditor } from "@/features/card-editor/hooks";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { Loader2 } from "lucide-react";
 
 export default function EditorPage() {
   const { cardId } = useParams<{ cardId?: string }>();
+  const { user, loading: authLoading } = useAuth();
+  const { card, loading, error, loadCard } = useCardEditor();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (cardId) {
+      loadCard(cardId);
+    }
+  }, [cardId, loadCard]);
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate("/");
+    return null;
+  }
+
   const isNew = !cardId;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold tracking-tight">{isNew ? "Create Card" : "Edit Card"}</h1>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name *</Label>
-              <Input id="firstName" placeholder="John" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name *</Label>
-              <Input id="lastName" placeholder="Doe" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="jobTitle">Job Title</Label>
-            <Input id="jobTitle" placeholder="Software Engineer" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="company">Company</Label>
-            <Input id="company" placeholder="Acme Inc." />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
-            <Textarea id="bio" placeholder="A brief introduction..." rows={3} />
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" type="button">
-              Cancel
-            </Button>
-            <Button type="submit">Save Card</Button>
-          </div>
-        </CardContent>
-      </Card>
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
+      )}
+      <div className="mt-8">
+        <EditorForm card={card} cardId={cardId} loading={loading && !!cardId} />
+      </div>
     </div>
   );
 }

@@ -67,3 +67,53 @@
 - `npm run build` — success, PWA SW regenerated
 
 ### Next: Phase 3 — Card CRUD & Dashboard
+
+---
+
+## Session 3 — 2026-06-12: Phase 3 Card CRUD & Dashboard
+
+### Created
+- **Card API** (`src/shared/api/cards.ts`):
+  - `createCard`, `getCard`, `updateCard`, `deleteCard` — full Firestore CRUD
+  - `listUserCards` — query by ownerUid, ordered by createdAt desc
+  - `getCardBySlug` — lookup by slug for public viewer
+  - `isSlugTaken` — uniqueness check with optional exclude for edits
+- **Card editor types** (`features/card-editor/types/`):
+  - `cardFormSchema` — zod schema covering all 20+ Card fields
+  - Sub-schemas for Phone, Email, Address, SocialLink
+  - `CardFormData` type inferred from schema
+- **Card editor hooks** (`features/card-editor/hooks/`):
+  - `useSaveCard` — create/update with auto-slug generation (retries up to 5 attempts on collision), toast feedback, redirect to dashboard
+  - `useCardEditor` — load existing card for editing
+  - Tests: 3 tests covering create, update, and error handling
+- **Card editor components** (`features/card-editor/components/`):
+  - `EditorForm` — full multi-section form with:
+    - Personal info: prefix, first, middle, last, suffix, nickname, job title, department, company, bio
+    - Dynamic arrays via `useFieldArray`: phones (type+number), emails (type+address), addresses (label+street+city+state+postal+country), social links (platform+url)
+    - Design: ThemePicker (cosmic/warm/minimal) with color previews, accent color picker
+    - ImageUploader: profile + background images with client-side compression → Firebase Storage upload
+    - Settings: isPublic toggle
+  - `ImageUploader` — compress → upload to Firebase Storage → return download URL, with preview and hover-to-change UX
+  - `ThemePicker` — visual theme selector with gradient previews + color input
+- **DashboardPage** (`src/pages/DashboardPage.tsx`):
+  - Lists user's cards in a responsive grid
+  - Shows name, job title/company, slug, view count, public/private status
+  - Actions: view (if public), edit, delete with confirmation
+  - Empty state with CTA to create first card
+  - Loading spinner state
+- **EditorPage** (`src/pages/EditorPage.tsx`):
+  - Auth guard: redirects to / if not signed in
+  - Loads existing card data for editing via `useCardEditor`
+  - Renders full `EditorForm`
+- **Dashboard hooks** (`features/dashboard/hooks/`):
+  - `useDashboardCards` — loads user's cards from Firestore
+- **Unit tests** (`shared/lib/utils/slugify.test.ts`): 7 tests covering spaces, special chars, accents, trimming, collapsing hyphens, uniqueness
+
+### Verification
+- `npm run type-check` — zero errors
+- `npm run lint` — zero warnings
+- `npm run test:unit` — 16/16 passed (3 test files)
+- `npm run build` — success, PWA SW regenerated
+- Note: Firebase chunk at 504KB, will optimize in Phase 7
+
+### Next: Phase 4 — Public Card Viewer & Sharing

@@ -8,8 +8,10 @@ service cloud.firestore {
 
     match /cards/{cardId} {
       allow read: if resource.data.isPublic == true || (request.auth != null && resource.data.ownerUid == request.auth.uid);
-      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid;
     }
 
     match /publicCards/{slug} {
@@ -26,6 +28,11 @@ service cloud.firestore {
       allow read: if request.auth != null && get(/databases/$(database)/documents/cards/$(cardId)).data.ownerUid == request.auth.uid;
       allow create: if true;
       allow update: if false;
+    }
+
+    match /pendingUpgrades/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
     }
   }
 }

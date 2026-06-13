@@ -11,6 +11,8 @@ import { cardFormSchema, type CardFormData } from "../types";
 import { ImageUploader } from "./ImageUploader";
 import { ThemePicker } from "./ThemePicker";
 import { useSaveCard } from "../hooks";
+import { usePlanLimits } from "@/features/payments/hooks";
+import { UpgradePrompt } from "@/features/payments/components/UpgradePrompt";
 import type { Card as CardData } from "@/shared/api/types";
 
 interface EditorFormProps {
@@ -34,6 +36,9 @@ function emptySocialLink() {
 
 export function EditorForm({ card, cardId, loading }: EditorFormProps) {
   const { save, saving } = useSaveCard();
+  const { plan, canAddField, canUseBackgroundImage } = usePlanLimits();
+
+  const socialLinksAtLimit = !canAddField("socialLinks", 0);
 
   const form = useForm<CardFormData>({
     resolver: zodResolver(cardFormSchema),
@@ -268,7 +273,13 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
       <CardUI>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Social Links</CardTitle>
-          <Button type="button" size="sm" variant="outline" onClick={() => socialLinksField.append(emptySocialLink())}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => socialLinksField.append(emptySocialLink())}
+            disabled={!canAddField("socialLinks", socialLinksField.fields.length)}
+          >
             <Plus className="h-4 w-4" /> Add
           </Button>
         </CardHeader>
@@ -285,6 +296,9 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               </Button>
             </div>
           ))}
+          {socialLinksAtLimit && plan === "free" && (
+            <UpgradePrompt currentPlan={plan} requiredPlan="pro" feature="Unlimited social links are available on the" />
+          )}
         </CardContent>
       </CardUI>
 
@@ -307,13 +321,20 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               onChange={(url) => setValue("profileImage", url)}
               storagePath="users"
             />
-            <ImageUploader
-              label="Background Image"
-              value={backgroundImage}
-              onChange={(url) => setValue("backgroundImage", url)}
-              storagePath="users/backgrounds"
-              maxSize={2000}
-            />
+            {canUseBackgroundImage() ? (
+              <ImageUploader
+                label="Background Image"
+                value={backgroundImage}
+                onChange={(url) => setValue("backgroundImage", url)}
+                storagePath="users/backgrounds"
+                maxSize={2000}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+                <p className="text-sm font-medium text-gray-400">Background Image</p>
+                <p className="text-xs text-gray-400">Pro feature</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </CardUI>

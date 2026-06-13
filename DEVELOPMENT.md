@@ -152,3 +152,49 @@
 - CardViewerPage chunk: 26.78 KB (gzip: 9.94 KB)
 
 ### Next: Phase 5 — Payments & Plan Enforcement
+
+---
+
+## Session 5 — 2026-06-12: Phase 5 Payments & Plan Enforcement
+
+### Created
+- **Plan config** (`features/payments/api/`):
+  - `planConfig` — per-tier limits: maxCards, maxSocialLinks, maxPhones/Emails/Addresses, available themes, backgroundImage toggle, analytics flag
+  - `isPlanAtLeast()` — tier comparison helper
+  - `createCheckoutSession()` — Firebase Functions callable stub (ready when Stripe keys added)
+  - Tests: 13 tests covering plan limits, tier comparison, theme access
+- **Plan limits hook** (`features/payments/hooks/`):
+  - `usePlanLimits` — exposes `canAddCard()`, `canAddField()`, `canUseTheme()`, `canUseBackgroundImage()` plus current plan config
+  - `useCheckout` — Stripe checkout redirect flow with loading/error states
+- **Plan UI components** (`features/payments/components/`):
+  - `PlanBadge` — colored pill showing Free/Pro/Business plan
+  - `UpgradePrompt` — "Upgrade to Pro/Business" card with feature description + link to pricing
+- **Updated DashboardPage**:
+  - Shows PlanBadge next to dashboard title
+  - Disables "New Card" button when at card limit
+  - Shows UpgradePrompt for free users at card limit
+- **Updated EditorForm**:
+  - Social links add button disabled at plan limit
+  - Background image uploader hidden for free plan (shows "Pro feature" placeholder)
+  - Shows UpgradePrompt for free users at social links limit
+- **Updated PricingPage**:
+  - Checkout buttons call Stripe via `useCheckout`
+  - Shows "Current Plan" for active tier
+  - Loading state on checkout buttons
+- **Cloud Functions stubs** (`functions/`):
+  - `createCheckoutSession` — callable function (commented-out Stripe integration, ready for keys)
+  - `stripeWebhook` — HTTP endpoint (commented-out plan upgrade logic)
+  - `updatePublicCardsCache` — denormalized card cache on card write
+  - package.json + tsconfig for functions deployment
+- **Updated firestore.rules**:
+  - Added `pendingUpgrades` collection rules
+  - Card create/update rules enforce ownerUid check
+
+### Verification
+- `npm run type-check` — zero errors
+- `npm run lint` — zero warnings
+- `npm run test:unit` — 39/39 passed (5 test files)
+- `npm run build` — success, PWA SW regenerated
+- Functions stubs are tsconfig-isolated (not compiled as part of Vite build)
+
+### Next: Phase 6 — Advanced Features (NFC, Messages, Analytics, Admin)

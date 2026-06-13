@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/sha
 import { Plus, Edit, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useDashboardCards } from "@/features/dashboard/hooks";
+import { usePlanLimits } from "@/features/payments/hooks";
+import { PlanBadge } from "@/features/payments/components/PlanBadge";
+import { UpgradePrompt } from "@/features/payments/components/UpgradePrompt";
 import { deleteCard } from "@/shared/api/cards";
 import { useToast } from "@/app/providers/ToastProvider";
 import { useEffect, useState } from "react";
@@ -12,6 +15,7 @@ import type { Card as CardType } from "@/shared/api/types";
 export default function DashboardPage() {
   const { user } = useAuth();
   const { cards, loading, loadCards } = useDashboardCards();
+  const { plan, canAddCard } = usePlanLimits();
   const { toast } = useToast();
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -33,20 +37,38 @@ export default function DashboardPage() {
     }
   };
 
+  const atLimit = !canAddCard(cards.length);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-gray-500">Manage your digital business cards</p>
+          <div className="mt-1 flex items-center gap-2">
+            <p className="text-sm text-gray-500">Manage your digital business cards</p>
+            <PlanBadge plan={plan} />
+          </div>
         </div>
-        <Button asChild>
-          <Link to="/editor">
+        {atLimit ? (
+          <Button disabled title="Upgrade to create more cards">
             <Plus className="h-4 w-4" />
-            New Card
-          </Link>
-        </Button>
+            Card Limit Reached
+          </Button>
+        ) : (
+          <Button asChild>
+            <Link to="/editor">
+              <Plus className="h-4 w-4" />
+              New Card
+            </Link>
+          </Button>
+        )}
       </div>
+
+      {atLimit && plan === "free" && (
+        <div className="mt-4">
+          <UpgradePrompt currentPlan={plan} requiredPlan="pro" feature="You've reached the free plan limit. Create more cards with the" />
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-12">
@@ -56,7 +78,7 @@ export default function DashboardPage() {
         <Card className="mt-8">
           <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
             <p className="text-gray-500">No cards yet. Create your first digital business card to get started.</p>
-            <Button asChild>
+            <Button asChild disabled={atLimit}>
               <Link to="/editor">
                 <Plus className="h-4 w-4" />
                 Create Your First Card

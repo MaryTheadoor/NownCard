@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #c9a278;
+  --color-brand-light: #d4b68a;
+  --color-brand-dark: #b08e5e;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --animate-flip: flip 0.6s ease-in-out;
+  --animate-flip-back: flip-back 0.6s ease-in-out;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes flip-back {
+  0% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+  }
+
+  *,
+  ::after,
+  ::before {
+    border-color: hsl(240 5.9% 90%);
+  }
+}

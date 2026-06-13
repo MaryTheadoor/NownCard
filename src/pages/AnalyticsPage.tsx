@@ -2,10 +2,13 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { useCardAnalytics } from "@/features/analytics/hooks";
-import { AnalyticsChart } from "@/features/analytics/components/AnalyticsChart";
 import { getCard } from "@/shared/api/cards";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import type { Card as CardType } from "@/shared/api/types";
+
+const AnalyticsChart = lazy(() =>
+  import("@/features/analytics/components/AnalyticsChart").then((m) => ({ default: m.AnalyticsChart })),
+);
 
 export default function AnalyticsPage() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -61,7 +64,9 @@ export default function AnalyticsPage() {
               <CardTitle>Daily Views & Saves</CardTitle>
             </CardHeader>
             <CardContent>
-              <AnalyticsChart data={data} />
+              <Suspense fallback={<div className="flex h-72 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div>}>
+                <AnalyticsChart data={data} />
+              </Suspense>
             </CardContent>
           </Card>
         </>

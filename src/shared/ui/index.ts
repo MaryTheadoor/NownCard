@@ -4,6 +4,7 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Input } from "./input";
 export { Label } from "./label";
 export { Textarea } from "./textarea";
+export { Skeleton, CardSkeleton, FormSkeleton, ViewerSkeleton } from "./skeleton";
 export {
   Dialog,
   DialogPortal,

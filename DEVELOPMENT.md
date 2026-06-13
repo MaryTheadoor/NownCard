@@ -198,3 +198,45 @@
 - Functions stubs are tsconfig-isolated (not compiled as part of Vite build)
 
 ### Next: Phase 6 — Advanced Features (NFC, Messages, Analytics, Admin)
+
+---
+
+## Session 6 — 2026-06-12: Phase 6 Advanced Features
+
+### Created
+- **NFC writer** (`features/nfc/`):
+  - `useNfcWriter` hook — Web NFC API integration, writes card URL to NFC tags, detects browser support
+  - `NfcButton` component — "Write to NFC Tag" button with loading state, hidden when unsupported
+- **Messages system** (`features/messages/`):
+  - `sendMessage`, `getUserMessages` — Firestore CRUD for messages collection
+  - `useSendMessage` hook — send with toast feedback
+  - `MessageForm` component — subject + body form on card viewer back side, shows sent confirmation
+- **Analytics dashboard** (`features/analytics/`):
+  - `useCardAnalytics` hook — fetches 30 days of analytics data from Firestore
+  - `AnalyticsChart` component — Recharts LineChart with views + saves, empty state
+  - `AnalyticsPage` — card-specific analytics at `/analytics/:cardId`, shows total views/saves + daily chart
+  - Dashboard cards now link to analytics for Pro/Business users
+- **Admin panel** (`features/admin/`):
+  - `useAdminUsers` hook — fetches all users from Firestore, ordered by createdAt
+  - `getUserCardCount` helper — counts cards per user
+  - `AdminUserTable` component — table with email, name, plan badge, card count, admin status, actions
+  - `AdminPage` at `/admin` — isAdmin-guarded, shows "Access Denied" for non-admins
+- **Updated routes** (`AppRoutes`):
+  - `/analytics/:cardId` — protected
+  - `/admin` — protected
+- **Updated CardViewerPage**:
+  - NFC write button on card back
+  - "Send Message" → MessageForm toggle
+- **Updated Navbar**:
+  - Admin link with Shield icon for admin users
+  - Mobile menu includes admin link
+- **Updated Message type**: added optional `id` field
+
+### Verification
+- `npm run type-check` — zero errors
+- `npm run lint` — zero warnings
+- `npm run test:unit` — 39/39 passed (5 test files)
+- `npm run build` — success, PWA SW regenerated (24 precache entries, 1408KB)
+- Note: AnalyticsPage chunk is 396KB (includes Recharts), will optimize in Phase 7
+
+### Next: Phase 7 — Polish, Performance & Launch Prep

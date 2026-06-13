@@ -5,12 +5,15 @@ import { usePublicCard } from "@/features/card-viewer/hooks";
 import { useViewTracking } from "@/features/card-viewer/hooks/useViewTracking";
 import { FlipCard } from "@/features/card-viewer/components/FlipCard";
 import { QRCodePanel } from "@/features/card-viewer/components/QRCodePanel";
+import { NfcButton } from "@/features/nfc/components/NfcButton";
+import { MessageForm } from "@/features/messages/components/MessageForm";
 import { useState } from "react";
 
 export default function CardViewerPage() {
   const { slug } = useParams<{ slug: string }>();
   const { card, loading, error } = usePublicCard(slug);
   const [showQR, setShowQR] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
 
   useViewTracking(card?.id, slug);
 
@@ -46,7 +49,21 @@ export default function CardViewerPage() {
         </Link>
 
         <FlipCard card={card} onFlip={(flipped) => setShowQR(flipped)}>
-          {showQR && <QRCodePanel card={card} cardUrl={cardUrl} />}
+          {showQR && (
+            <div className="flex flex-col gap-4">
+              <QRCodePanel card={card} cardUrl={cardUrl} />
+              <NfcButton url={cardUrl} cardName={`${card.firstName} ${card.lastName}`} />
+              <div className="border-t pt-4">
+                {!showMessage ? (
+                  <Button variant="outline" className="w-full" onClick={() => setShowMessage(true)}>
+                    Send Message
+                  </Button>
+                ) : (
+                  <MessageForm card={card} />
+                )}
+              </div>
+            </div>
+          )}
         </FlipCard>
 
         <div className="mt-6 text-center">

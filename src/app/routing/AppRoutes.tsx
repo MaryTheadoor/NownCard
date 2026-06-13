@@ -9,6 +9,8 @@ const EditorPage = lazy(() => import("@/pages/EditorPage"));
 const CardViewerPage = lazy(() => import("@/pages/CardViewerPage"));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const PricingPage = lazy(() => import("@/pages/PricingPage"));
+const AnalyticsPage = lazy(() => import("@/pages/AnalyticsPage"));
+const AdminPage = lazy(() => import("@/pages/AdminPage"));
 
 function PageLoader() {
   return (
@@ -32,6 +34,22 @@ export function AppRoutes() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics/:cardId"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPage />
               </ProtectedRoute>
             }
           />

@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useSignOut } from "@/features/auth/hooks";
 import { Button } from "@/shared/ui/button";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Shield } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "@/widgets/AuthModal/AuthModal";
 
 export function Navbar() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const { signOut } = useSignOut();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -37,6 +37,14 @@ export function Navbar() {
                     Dashboard
                   </Link>
                 </Button>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/admin">
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Link>
+                  </Button>
+                )}
                 <Button variant="ghost" size="icon" onClick={handleSignOut} aria-label="Sign out">
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -64,6 +72,11 @@ export function Navbar() {
                   <Link to="/dashboard" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
                     Dashboard
                   </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
+                      Admin
+                    </Link>
+                  )}
                   <button className="text-left text-sm font-medium text-red-500" onClick={handleSignOut}>
                     Sign Out
                   </button>

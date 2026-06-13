@@ -75,6 +75,7 @@ export interface Card {
 }
 
 export interface Message {
+  id?: string;
   senderUid: string;
   recipientUid: string;
   cardSlug: string;

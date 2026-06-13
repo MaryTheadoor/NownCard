@@ -117,3 +117,38 @@
 - Note: Firebase chunk at 504KB, will optimize in Phase 7
 
 ### Next: Phase 4 — Public Card Viewer & Sharing
+
+---
+
+## Session 4 — 2026-06-12: Phase 4 Public Card Viewer & Sharing
+
+### Created
+- **vCard generator** (`shared/lib/vcard/generateVCard.ts`):
+  - Full vCard 4.0 spec: FN, N, NICKNAME, TITLE, ORG, NOTE, TEL, EMAIL, ADR, URL, PHOTO, REV
+  - Proper escaping of `, ; \ \n` special characters
+  - Line folding at 75 chars per RFC 6350
+  - Phone types mapped to TEL.TYPE (CELL, WORK, HOME, PREF)
+  - Email types mapped to EMAIL.TYPE
+  - Social links mapped to URL.TYPE with platform label
+  - `downloadVCard()` — blob-based .vcf download with dynamic filename
+  - Tests: 10 tests covering full name, prefix/suffix, job/company, phones, emails, addresses, social links, nickname/bio, escaping, empty card
+- **usePublicCard hook** — fetches card by slug, checks `isPublic`, handles loading/error states
+- **useViewTracking hook** — writes to `analytics/{cardId}/{date}` subcollection on first view (merge + increment), debounced via `useRef`
+- **FlipCard component** (3D CSS):
+  - `perspective-[1000px]` + `[transform-style:preserve-3d]` for 3D flip
+  - Front side: gradient background by theme (cosmic/warm/minimal), profile image or initials avatar, name, job title, company, nickname
+  - Back side: contact details (phones as tel: links, emails as mailto:, addresses, social links), bio
+  - Tap/click to flip with keyboard accessibility
+  - Renders children (QRCodePanel) on the back when flipped
+- **QRCodePanel** — Save Contact button (vCard download), Share button (Web Share API with clipboard fallback), QR code (qrcode.react with card accent color)
+- **CardViewerPage** — full page layout: loading/error/not-found states, FlipCard + QRCodePanel, "Powered by NownCard" footer with link back
+- **Card viewer barrel** — `features/card-viewer/index.ts` with public API
+
+### Verification
+- `npm run type-check` — zero errors
+- `npm run lint` — zero warnings
+- `npm run test:unit` — 26/26 passed (4 test files)
+- `npm run build` — success, PWA SW regenerated
+- CardViewerPage chunk: 26.78 KB (gzip: 9.94 KB)
+
+### Next: Phase 5 — Payments & Plan Enforcement

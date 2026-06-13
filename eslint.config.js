@@ -23,7 +23,7 @@ export default tseslint.config(
         "warn",
         {
           allowConstantExport: true,
-          allowExportNames: ["useAuth", "useTheme", "useToast", "useQueryClient", "buttonVariants", "useSignIn", "useSignUp", "useGoogleSignIn", "useSignOut", "useSaveCard", "useCardEditor", "useDashboardCards"],
+          allowExportNames: ["useAuth", "useTheme", "useToast", "useQueryClient", "buttonVariants", "useSignIn", "useSignUp", "useGoogleSignIn", "useSignOut", "useSaveCard", "useCardEditor", "useDashboardCards", "usePublicCard", "useViewTracking"],
         },
       ],
     },

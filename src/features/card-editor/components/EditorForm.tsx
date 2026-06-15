@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/shared/ui/button";
@@ -6,13 +6,16 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Textarea } from "@/shared/ui/textarea";
 import { Card as CardUI, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Upload, User } from "lucide-react";
 import { cardFormSchema, type CardFormData } from "../types";
 import { ImageUploader } from "./ImageUploader";
 import { ThemePicker } from "./ThemePicker";
 import { useSaveCard } from "../hooks";
 import { usePlanLimits } from "@/features/payments/hooks";
 import { UpgradePrompt } from "@/features/payments/components/UpgradePrompt";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { parseVCard } from "@/shared/lib/vcard/vcardParser";
+import { useToast } from "@/app/providers/ToastProvider";
 import type { Card as CardData } from "@/shared/api/types";
 
 interface EditorFormProps {
@@ -37,6 +40,9 @@ function emptySocialLink() {
 export function EditorForm({ card, cardId, loading }: EditorFormProps) {
   const { save, saving } = useSaveCard();
   const { plan, canAddField, canUseBackgroundImage } = usePlanLimits();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const socialLinksAtLimit = !canAddField("socialLinks", 0);
 
@@ -58,7 +64,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
       addresses: [],
       socialLinks: [],
       theme: "minimal",
-      accentColor: "#c9a278",
+      accentColor: "#e8a628",
       isPublic: false,
     },
   });
@@ -83,8 +89,8 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         department: card.department ?? "",
         company: card.company ?? "",
         bio: card.bio ?? "",
-        phones: card.phones ?? [],
-        emails: card.emails ?? [],
+        phones: (card.phones ?? []).map((p) => ({ type: p.type as "mobile" | "work" | "home" | "other", number: p.number, primary: p.primary })),
+        emails: (card.emails ?? []).map((e) => ({ type: e.type as "work" | "personal" | "other", address: e.address, primary: e.primary })),
         addresses: card.addresses ?? [],
         socialLinks: card.socialLinks ?? [],
         theme: card.theme,
@@ -98,10 +104,68 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
     await save(data, cardId);
   };
 
+  const handleImportFromProfile = () => {
+    if (!user) return;
+    const current = form.getValues();
+    reset({
+      ...current,
+      firstName: user.displayName?.split(" ")[0] ?? current.firstName,
+      lastName: user.displayName?.split(" ").slice(1).join(" ") ?? current.lastName,
+    });
+    if (user.email && emailsField.fields.length === 0) {
+      emailsField.append({ type: "work" as const, address: user.email });
+    }
+    if (user.photoURL && !current.profileImage) {
+      setValue("profileImage", user.photoURL);
+    }
+    toast({ title: "Profile data imported", variant: "success" });
+  };
+
+  const handleVCardImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const parsed = parseVCard(text);
+      const current = form.getValues();
+      reset({
+        prefix: parsed.prefix ?? current.prefix,
+        firstName: parsed.firstName ?? current.firstName,
+        middleName: parsed.middleName ?? current.middleName,
+        lastName: parsed.lastName ?? current.lastName,
+        suffix: parsed.suffix ?? current.suffix,
+        jobTitle: parsed.jobTitle ?? current.jobTitle,
+        department: parsed.department ?? current.department,
+        company: parsed.company ?? current.company,
+        bio: parsed.bio ?? current.bio,
+        phones: parsed.phones.length > 0 ? parsed.phones.map((p) => ({ type: (p.type || "mobile") as "mobile" | "work" | "home" | "other", number: p.number })) : current.phones,
+        emails: parsed.emails.length > 0
+          ? parsed.emails.map((e) => ({ type: (e.type || "work") as "work" | "personal" | "other", address: e.address }))
+          : current.emails,
+        addresses: parsed.addresses.length > 0 ? parsed.addresses : current.addresses,
+        socialLinks: parsed.socialLinks.length > 0 ? parsed.socialLinks : current.socialLinks,
+        theme: current.theme,
+        accentColor: current.accentColor,
+        isPublic: current.isPublic,
+      });
+      if (parsed.profileImage && !current.profileImage) {
+        setValue("profileImage", parsed.profileImage);
+      }
+      toast({ title: "vCard imported", variant: "success" });
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-yellow" />
       </div>
     );
   }
@@ -119,6 +183,23 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
           <CardTitle>Personal Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!cardId && (
+            <div className="flex gap-2 mb-2">
+              <Button type="button" size="sm" variant="ghost" onClick={handleImportFromProfile}>
+                <User className="h-3.5 w-3.5" /> Use My Profile
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={handleVCardImport}>
+                <Upload className="h-3.5 w-3.5" /> Import .vcf
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".vcf,.vcard"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="prefix">Prefix</Label>
@@ -133,7 +214,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name *</Label>
               <Input id="firstName" placeholder="John" {...register("firstName")} />
-              {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
+              {errors.firstName && <p className="text-sm text-danger">{errors.firstName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="middleName">Middle Name</Label>
@@ -144,7 +225,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
             <div className="space-y-2">
               <Label htmlFor="lastName">Last Name *</Label>
               <Input id="lastName" placeholder="Doe" {...register("lastName")} />
-              {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
+              {errors.lastName && <p className="text-sm text-danger">{errors.lastName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="nickname">Nickname</Label>
@@ -182,7 +263,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           {phonesField.fields.length === 0 && (
-            <p className="text-sm text-gray-500">No phone numbers added.</p>
+            <p className="text-sm text-ink-muted">No phone numbers added.</p>
           )}
           {phonesField.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start">
@@ -197,7 +278,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               </select>
               <Input placeholder="+1 (555) 000-0000" {...register(`phones.${index}.number`)} />
               <Button type="button" size="icon" variant="ghost" onClick={() => phonesField.remove(index)} aria-label="Remove">
-                <Trash2 className="h-4 w-4 text-red-500" />
+                <Trash2 className="h-4 w-4 text-danger" />
               </Button>
             </div>
           ))}
@@ -214,7 +295,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           {emailsField.fields.length === 0 && (
-            <p className="text-sm text-gray-500">No email addresses added.</p>
+            <p className="text-sm text-ink-muted">No email addresses added.</p>
           )}
           {emailsField.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start">
@@ -228,7 +309,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               </select>
               <Input type="email" placeholder="you@example.com" {...register(`emails.${index}.address`)} />
               <Button type="button" size="icon" variant="ghost" onClick={() => emailsField.remove(index)} aria-label="Remove">
-                <Trash2 className="h-4 w-4 text-red-500" />
+                <Trash2 className="h-4 w-4 text-danger" />
               </Button>
             </div>
           ))}
@@ -245,14 +326,14 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           {addressesField.fields.length === 0 && (
-            <p className="text-sm text-gray-500">No addresses added.</p>
+            <p className="text-sm text-ink-muted">No addresses added.</p>
           )}
           {addressesField.fields.map((field, index) => (
             <div key={field.id} className="space-y-3 rounded-lg border p-3">
               <div className="flex justify-between">
                 <Input placeholder="Label (e.g. Office, Home)" {...register(`addresses.${index}.label`)} className="flex-1" />
                 <Button type="button" size="icon" variant="ghost" onClick={() => addressesField.remove(index)} aria-label="Remove">
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4 text-danger" />
                 </Button>
               </div>
               <Input placeholder="Street address" {...register(`addresses.${index}.street`)} />
@@ -285,14 +366,14 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           {socialLinksField.fields.length === 0 && (
-            <p className="text-sm text-gray-500">No social links added.</p>
+            <p className="text-sm text-ink-muted">No social links added.</p>
           )}
           {socialLinksField.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start">
               <Input placeholder="Platform (e.g. LinkedIn)" {...register(`socialLinks.${index}.platform`)} className="w-40" />
               <Input placeholder="https://..." {...register(`socialLinks.${index}.url`)} className="flex-1" />
               <Button type="button" size="icon" variant="ghost" onClick={() => socialLinksField.remove(index)} aria-label="Remove">
-                <Trash2 className="h-4 w-4 text-red-500" />
+                <Trash2 className="h-4 w-4 text-danger" />
               </Button>
             </div>
           ))}
@@ -331,8 +412,8 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
-                <p className="text-sm font-medium text-gray-400">Background Image</p>
-                <p className="text-xs text-gray-400">Pro feature</p>
+                <p className="text-sm font-medium text-ink-faint">Background Image</p>
+                <p className="text-xs text-ink-faint">Pro feature</p>
               </div>
             )}
           </div>
@@ -346,10 +427,10 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         </CardHeader>
         <CardContent>
           <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" {...register("isPublic")} className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand" />
+            <input type="checkbox" {...register("isPublic")} className="h-4 w-4 rounded border-line text-brand-yellow focus:ring-accent-blue" />
             <div>
               <p className="text-sm font-medium">Make card public</p>
-              <p className="text-xs text-gray-500">Anyone with the link can view your card</p>
+              <p className="text-xs text-ink-muted">Anyone with the link can view your card</p>
             </div>
           </label>
         </CardContent>

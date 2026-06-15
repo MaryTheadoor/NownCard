@@ -1,108 +1,105 @@
 import type { Card } from "@/shared/api/types";
 
-function escapeVCard(value: string): string {
-  return value.replace(/[,;\\\n]/g, "\\$&");
+function escVCard(val: string): string {
+  return val.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,");
 }
 
-function foldLine(line: string): string {
-  if (line.length <= 75) return line;
-  const parts: string[] = [];
-  let remaining = line;
-  while (remaining.length > 75) {
-    parts.push(remaining.slice(0, 75));
-    remaining = " " + remaining.slice(75);
+export function generateVCard(card: Card | Partial<Card>, cardPageUrl?: string): string {
+  const parts: string[] = ["BEGIN:VCARD", "VERSION:3.0"];
+
+  const name = [];
+  if (card.lastName) name.push(escVCard(card.lastName));
+  else name.push("");
+  if (card.firstName) name.push(escVCard(card.firstName));
+  else name.push("");
+  if (card.middleName) name.push(escVCard(card.middleName ?? ""));
+  else name.push("");
+  if (card.prefix) name.push(escVCard(card.prefix));
+  else name.push("");
+  if (card.suffix) name.push(escVCard(card.suffix));
+  else name.push("");
+  parts.push(`N:${name.join(";")}`);
+
+  const fn = [];
+  if (card.prefix) fn.push(escVCard(card.prefix));
+  if (card.firstName) fn.push(escVCard(card.firstName));
+  if (card.middleName) fn.push(escVCard(card.middleName));
+  if (card.lastName) fn.push(escVCard(card.lastName));
+  if (card.suffix) fn.push(escVCard(card.suffix));
+  parts.push(`FN:${fn.join(" ")}`);
+
+  if (card.nickname) parts.push(`NICKNAME:${escVCard(card.nickname)}`);
+  if (card.jobTitle) parts.push(`TITLE:${escVCard(card.jobTitle)}`);
+  if (card.company)
+    parts.push(
+      `ORG:${escVCard(card.company)}${card.department ? `;${escVCard(card.department)}` : ""}`,
+    );
+  if (card.bio)
+    parts.push(`NOTE:${escVCard(card.bio).replace(/\n/g, "\\n")}`);
+
+  if (card.phones?.length) {
+    card.phones.forEach((p) => {
+      parts.push(`TEL;TYPE=${(p.type || "CELL").toUpperCase()}:${p.number}`);
+    });
   }
-  if (remaining) parts.push(remaining);
+
+  if (card.emails?.length) {
+    card.emails.forEach((e) => {
+      parts.push(
+        `EMAIL;TYPE=${(e.type || "WORK").toUpperCase()}:${e.address}`,
+      );
+    });
+  }
+
+  if (card.websites?.length) {
+    card.websites.forEach((w) => {
+      if (!w.url) return;
+      const url = w.url.startsWith("http") ? w.url : `https://${w.url}`;
+      parts.push(`URL:${url}`);
+    });
+  }
+
+  if (card.addresses?.length) {
+    card.addresses.forEach((a) => {
+      parts.push(
+        `ADR;TYPE=${(a.type || "WORK").toUpperCase()}:;;${escVCard(a.street || "")};${escVCard(a.city || "")};${escVCard(a.state || "")};${escVCard(a.postalCode || a.zip || "")};${escVCard(a.country || "")}`,
+      );
+    });
+  }
+
+  if (card.birthday) parts.push(`BDAY:${card.birthday}`);
+  if (card.profileImage) parts.push(`PHOTO;VALUE=URI:${card.profileImage}`);
+
+  if (Array.isArray(card.socialLinks)) {
+    card.socialLinks.forEach((s) => {
+      if (s.url)
+        parts.push(
+          `X-SOCIALPROFILE;TYPE=${s.platform.toUpperCase()}:${s.url}`,
+        );
+    });
+  }
+
+  if (cardPageUrl) {
+    parts.push(`URL:${cardPageUrl}`);
+  }
+
+  parts.push("END:VCARD");
   return parts.join("\r\n");
 }
 
-export function generateVCard(card: Card): string {
-  const lines: string[] = [];
-
-  lines.push("BEGIN:VCARD");
-  lines.push("VERSION:4.0");
-
-  const fullName = [card.prefix, card.firstName, card.middleName, card.lastName, card.suffix]
-    .filter(Boolean)
-    .join(" ");
-  lines.push(`FN:${escapeVCard(fullName)}`);
-
-  const lastName = [card.prefix, card.lastName].filter(Boolean).join(" ");
-  const firstNameFields = [card.firstName, card.middleName].filter(Boolean).join(" ");
-  lines.push(`N:${escapeVCard(lastName)};${escapeVCard(firstNameFields)};;;`);
-
-  if (card.nickname) {
-    lines.push(`NICKNAME:${escapeVCard(card.nickname)}`);
-  }
-
-  if (card.jobTitle) {
-    lines.push(`TITLE:${escapeVCard(card.jobTitle)}`);
-  }
-
-  if (card.company) {
-    let org = card.company;
-    if (card.department) org += `;${card.department}`;
-    lines.push(`ORG:${escapeVCard(org)}`);
-  }
-
-  if (card.bio) {
-    lines.push(`NOTE:${escapeVCard(card.bio)}`);
-  }
-
-  for (const phone of card.phones) {
-    const types: string[] = [];
-    if (phone.primary) types.push("PREF");
-    switch (phone.type) {
-      case "mobile": types.push("CELL"); break;
-      case "work": types.push("WORK"); break;
-      case "home": types.push("HOME"); break;
-    }
-    lines.push(`TEL;TYPE=${types.join(",")}:${escapeVCard(phone.number)}`);
-  }
-
-  for (const email of card.emails) {
-    const types: string[] = [];
-    if (email.primary) types.push("PREF");
-    switch (email.type) {
-      case "work": types.push("WORK"); break;
-      case "personal": types.push("HOME"); break;
-    }
-    lines.push(`EMAIL${types.length ? `;TYPE=${types.join(",")}` : ""}:${escapeVCard(email.address)}`);
-  }
-
-  for (const addr of card.addresses) {
-    const label = addr.label ? `;LABEL="${escapeVCard(addr.label)}"` : "";
-    lines.push(
-      `ADR${label};;${escapeVCard(addr.street)};${escapeVCard(addr.city)};${escapeVCard(addr.state ?? "")};${escapeVCard(addr.postalCode ?? "")};${escapeVCard(addr.country)}`,
-    );
-  }
-
-  for (const link of card.socialLinks) {
-    const label = link.platform.charAt(0).toUpperCase() + link.platform.slice(1);
-    lines.push(`URL;TYPE=${escapeVCard(label)}:${escapeVCard(link.url)}`);
-  }
-
-  if (card.profileImage) {
-    lines.push(`PHOTO;VALUE=URI:${escapeVCard(card.profileImage)}`);
-  }
-
-  lines.push(`REV:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`);
-  lines.push("END:VCARD");
-
-  return lines.map(foldLine).join("\r\n") + "\r\n";
-}
-
-export function downloadVCard(card: Card, fileName?: string): void {
-  const vcard = generateVCard(card);
+export function downloadVCard(
+  card: Card | Partial<Card>,
+  filename?: string,
+  cardPageUrl?: string,
+) {
+  const vcard = generateVCard(card, cardPageUrl);
   const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
   const url = URL.createObjectURL(blob);
-
-  const name = fileName ?? `${card.firstName}-${card.lastName}`.toLowerCase().replace(/\s+/g, "-");
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${name}.vcf`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename || `${card.slug || "contact"}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }

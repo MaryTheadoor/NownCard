@@ -2,6 +2,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -46,6 +47,10 @@ export async function signInWithGoogle() {
 
 export async function signOutUser() {
   return signOut(auth);
+}
+
+export async function resetPassword(email: string) {
+  return sendPasswordResetEmail(auth, email);
 }
 
 export function onAuthChange(callback: (user: AuthUser | null) => void) {

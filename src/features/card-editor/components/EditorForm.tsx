@@ -16,6 +16,7 @@ import { UpgradePrompt } from "@/features/payments/components/UpgradePrompt";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { parseVCard } from "@/shared/lib/vcard/vcardParser";
 import { useToast } from "@/app/providers/ToastProvider";
+import { SOCIAL_PLATFORMS, GOOGLE_FONTS } from "@/shared/lib/utils/helpers";
 import type { Card as CardData } from "@/shared/api/types";
 
 interface EditorFormProps {
@@ -65,6 +66,9 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
       socialLinks: [],
       theme: "minimal",
       accentColor: "#e8a628",
+      fontFamily: "",
+      fontSizeScale: 1,
+      customFontUrl: "",
       isPublic: false,
     },
   });
@@ -95,6 +99,9 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         socialLinks: card.socialLinks ?? [],
         theme: card.theme,
         accentColor: card.accentColor,
+        fontFamily: card.fontFamily ?? "",
+        fontSizeScale: card.fontSizeScale ?? 1,
+        customFontUrl: card.customFontUrl ?? "",
         isPublic: card.isPublic,
       });
     }
@@ -174,6 +181,8 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
   const accentColor = watch("accentColor");
   const profileImage = watch("profileImage");
   const backgroundImage = watch("backgroundImage");
+  const fontFamily = watch("fontFamily");
+  const customFontUrl = watch("customFontUrl");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -370,7 +379,17 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
           )}
           {socialLinksField.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start">
-              <Input placeholder="Platform (e.g. LinkedIn)" {...register(`socialLinks.${index}.platform`)} className="w-40" />
+              <select
+                className="h-9 w-40 rounded-md border border-input bg-transparent px-2 text-sm"
+                {...register(`socialLinks.${index}.platform`)}
+              >
+                <option value="">Select...</option>
+                {SOCIAL_PLATFORMS.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
               <Input placeholder="https://..." {...register(`socialLinks.${index}.url`)} className="flex-1" />
               <Button type="button" size="icon" variant="ghost" onClick={() => socialLinksField.remove(index)} aria-label="Remove">
                 <Trash2 className="h-4 w-4 text-danger" />
@@ -395,6 +414,43 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
             accentColor={accentColor}
             onAccentColorChange={(v) => setValue("accentColor", v)}
           />
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Typography</p>
+            <select
+              className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              value={fontFamily || ""}
+              onChange={(e) => setValue("fontFamily", e.target.value || undefined)}
+            >
+              <option value="">Manrope (default)</option>
+              {GOOGLE_FONTS.filter((f) => f.value !== "Manrope").map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="url"
+              placeholder="Custom font URL (Pro feature)"
+              value={customFontUrl || ""}
+              onChange={(e) => setValue("customFontUrl", e.target.value || undefined)}
+              className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              disabled={plan === "free"}
+            />
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="0.7"
+                max="1.5"
+                step="0.05"
+                value={watch("fontSizeScale") || 1}
+                onChange={(e) => setValue("fontSizeScale", parseFloat(e.target.value))}
+                className="flex-1"
+              />
+              <span className="text-xs text-ink-muted w-10">{Math.round((watch("fontSizeScale") || 1) * 100)}%</span>
+            </div>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <ImageUploader
               label="Profile Image"

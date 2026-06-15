@@ -9,14 +9,20 @@ export function Footer() {
             &copy; {new Date().getFullYear()} NownCard. All rights reserved.
           </p>
           <div className="flex gap-6">
+            <Link to="/rolodex" className="text-sm text-ink-muted hover:text-ink">
+              Directory
+            </Link>
             <Link to="/pricing" className="text-sm text-ink-muted hover:text-ink">
               Pricing
             </Link>
-            <Link to="/" className="text-sm text-ink-muted hover:text-ink">
+            <Link to="/privacy" className="text-sm text-ink-muted hover:text-ink">
               Privacy
             </Link>
-            <Link to="/" className="text-sm text-ink-muted hover:text-ink">
+            <Link to="/terms" className="text-sm text-ink-muted hover:text-ink">
               Terms
+            </Link>
+            <Link to="/contact" className="text-sm text-ink-muted hover:text-ink">
+              Contact
             </Link>
           </div>
         </div>

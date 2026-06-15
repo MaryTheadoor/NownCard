@@ -1,4 +1,4 @@
-import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOutUser } from "@/shared/lib/firebase/auth";
+import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOutUser, resetPassword as firebaseResetPassword } from "@/shared/lib/firebase/auth";
 import type { AuthUser } from "@/shared/lib/firebase/auth";
 
 export async function loginWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -15,4 +15,8 @@ export async function loginWithGoogle(): Promise<AuthUser> {
 
 export async function logout(): Promise<void> {
   return signOutUser();
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  return firebaseResetPassword(email);
 }

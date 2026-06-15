@@ -12,6 +12,10 @@ const PricingPage = lazy(() => import("@/pages/PricingPage"));
 const AnalyticsPage = lazy(() => import("@/pages/AnalyticsPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const RolodexPage = lazy(() => import("@/pages/RolodexPage"));
+const TermsPage = lazy(() => import("@/pages/TermsPage"));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
+const ContactPage = lazy(() => import("@/pages/ContactPage"));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 
 function PageLoader() {
   return (
@@ -30,6 +34,10 @@ export function AppRoutes() {
           <Route path="/editor/:cardId?" element={<EditorPage />} />
           <Route path="/card/:slug" element={<CardViewerPage />} />
           <Route path="/rolodex" element={<RolodexPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<NotFoundPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route
             path="/dashboard"

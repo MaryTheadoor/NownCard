@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { loginWithEmail, registerWithEmail, loginWithGoogle, logout } from "../api";
+import { loginWithEmail, registerWithEmail, loginWithGoogle, logout, sendPasswordReset } from "../api";
 import { useToast } from "@/app/providers/ToastProvider";
 import type { AuthUser } from "@/shared/lib/firebase/auth";
 
@@ -101,4 +101,30 @@ export function useSignOut() {
   }, [toast]);
 
   return { signOut, loading };
+}
+
+export function useResetPassword() {
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const { toast } = useToast();
+
+  const reset = useCallback(
+    async (email: string): Promise<boolean> => {
+      setLoading(true);
+      try {
+        await sendPasswordReset(email);
+        setSent(true);
+        toast({ title: "Reset email sent", description: `Check ${email} for the reset link`, variant: "success" });
+        return true;
+      } catch {
+        toast({ title: "Reset failed", description: "Could not send reset email", variant: "error" });
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast],
+  );
+
+  return { reset, loading, sent };
 }

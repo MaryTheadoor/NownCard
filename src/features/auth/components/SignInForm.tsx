@@ -17,9 +17,10 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 interface SignInFormProps {
   onSuccess?: () => void;
   onSwitchToSignUp?: () => void;
+  onForgotPassword?: () => void;
 }
 
-export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
+export function SignInForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: SignInFormProps) {
   const { signIn, loading, error } = useSignIn();
 
   const {
@@ -51,6 +52,15 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
         {errors.password && <p className="text-sm text-danger">{errors.password.message}</p>}
       </div>
       {error && <p className="text-sm text-danger">{error}</p>}
+      <div className="flex items-center justify-end">
+        <button
+          type="button"
+          onClick={onForgotPassword}
+          className="text-xs text-ink-muted hover:text-brand-yellow"
+        >
+          Forgot password?
+        </button>
+      </div>
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
       </Button>

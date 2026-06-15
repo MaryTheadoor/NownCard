@@ -42,7 +42,7 @@ export interface CreateCardInput {
   isPublic: boolean;
 }
 
-export type UpdateCardInput = Partial<CreateCardInput>;
+export type UpdateCardInput = Partial<CreateCardInput> & Partial<Pick<Card, "cardTheme" | "fontFamily" | "fontSizeScale" | "textColor" | "bgOpacity" | "viewCount" | "saveCount" | "isTeamCard">>;
 
 export async function createCard(input: CreateCardInput): Promise<Card> {
   const now = serverTimestamp() as unknown as Timestamp;
@@ -96,4 +96,15 @@ export async function isSlugTaken(slug: string, excludeCardId?: string): Promise
   if (snap.empty) return false;
   if (excludeCardId && snap.docs[0].id === excludeCardId) return false;
   return true;
+}
+
+export async function listPublicCards(): Promise<Card[]> {
+  const q = query(
+    cardsCollection,
+    where("isPublic", "==", true),
+    orderBy("updatedAt", "desc"),
+    limit(100),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Card);
 }

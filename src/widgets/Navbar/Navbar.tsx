@@ -26,6 +26,9 @@ export function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-4 md:flex">
+            <Link to="/rolodex" className="text-sm font-medium text-ink-muted hover:text-ink">
+              Directory
+            </Link>
             <Link to="/pricing" className="text-sm font-medium text-ink-muted hover:text-ink">
               Pricing
             </Link>
@@ -64,6 +67,9 @@ export function Navbar() {
         {mobileOpen && (
           <div className="border-t bg-tile px-4 pb-4 md:hidden">
             <nav className="flex flex-col gap-3 pt-3">
+              <Link to="/rolodex" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
+                Directory
+              </Link>
               <Link to="/pricing" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
                 Pricing
               </Link>

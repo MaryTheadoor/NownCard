@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCard, getCard, updateCard, isSlugTaken } from "@/shared/api/cards";
-import { generateUniqueSlug } from "@/shared/lib/utils/slugify";
+import { generateUniqueSlug, slugify } from "@/shared/lib/utils/slugify";
 import { useToast } from "@/app/providers/ToastProvider";
 import { useAuth } from "@/app/providers/AuthProvider";
 import type { CardFormData } from "../types";
@@ -20,6 +20,12 @@ export function useSaveCard() {
         return null;
       }
 
+      // Validate required fields
+      if (!data.firstName.trim() || !data.lastName.trim()) {
+        toast({ title: "Missing required fields", description: "First name and last name are required", variant: "error" });
+        return null;
+      }
+
       setSaving(true);
       try {
         if (cardId) {
@@ -32,11 +38,22 @@ export function useSaveCard() {
           return null;
         }
 
+        // Generate unique slug with collision retry
+        const base = slugify(`${data.firstName}-${data.lastName}`);
         let slug = generateUniqueSlug(data.firstName, data.lastName);
         let attempts = 0;
-        while (await isSlugTaken(slug) && attempts < 5) {
-          slug = generateUniqueSlug(data.firstName, data.lastName);
+
+        while (attempts < 5) {
+          const taken = await isSlugTaken(slug);
+          if (!taken) break;
+          // Generate new slug with different suffix
+          slug = `${base}-${Math.random().toString(36).substring(2, 6)}`;
           attempts++;
+        }
+
+        if (attempts >= 5) {
+          toast({ title: "Could not generate unique URL", description: "Please try again", variant: "error" });
+          return null;
         }
 
         const card = await createCard({
@@ -44,7 +61,7 @@ export function useSaveCard() {
           slug,
           ...data,
         });
-        toast({ title: "Card created!", description: `/${card.slug}`, variant: "success" });
+        toast({ title: "Card created!", description: `/card/${card.slug}`, variant: "success" });
         navigate("/dashboard");
         return card;
       } catch (e: unknown) {
@@ -61,9 +78,9 @@ export function useSaveCard() {
   return { save, saving };
 }
 
-export function useCardEditor(cardId?: string) {
+export function useCardEditor() {
   const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(!!cardId);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadCard = useCallback(async (id: string) => {

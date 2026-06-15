@@ -28,7 +28,12 @@ export function ImageUploader({ label, value, onChange, storagePath, maxSize = 1
       setUploading(true);
       try {
         const compressed = await compressImage(file, maxSize);
-        const fileRef = ref(storage, `${storagePath}/${user.uid}/${Date.now()}-${file.name}`);
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const path = storagePath
+          .replace("{uid}", user.uid)
+          .replace("{timestamp}", String(Date.now()))
+          .replace("{filename}", safeName);
+        const fileRef = ref(storage, path);
         await uploadBytes(fileRef, compressed);
         const url = await getDownloadURL(fileRef);
         setPreview(url);

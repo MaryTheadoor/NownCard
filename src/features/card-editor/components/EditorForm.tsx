@@ -456,14 +456,14 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               label="Profile Image"
               value={profileImage}
               onChange={(url) => setValue("profileImage", url)}
-              storagePath="users"
+              storagePath="users/{uid}/profile.jpg"
             />
             {canUseBackgroundImage() ? (
               <ImageUploader
                 label="Background Image"
                 value={backgroundImage}
                 onChange={(url) => setValue("backgroundImage", url)}
-                storagePath="users/backgrounds"
+                storagePath="users/{uid}/backgrounds/{timestamp}-{filename}"
                 maxSize={2000}
               />
             ) : (

@@ -20,7 +20,7 @@ export default function EditorPage() {
   if (authLoading) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-yellow" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function EditorPage() {
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold tracking-tight">{isNew ? "Create Card" : "Edit Card"}</h1>
       {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
+        <div className="mt-4 rounded-lg border border-danger-dark bg-danger/10 p-4 text-sm text-danger">{error}</div>
       )}
       <div className="mt-8">
         <EditorForm card={card} cardId={cardId} loading={loading && !!cardId} />

@@ -43,21 +43,21 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
       <div className="space-y-2">
         <Label htmlFor="signin-email">Email</Label>
         <Input id="signin-email" type="email" placeholder="you@example.com" {...register("email")} />
-        {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+        {errors.email && <p className="text-sm text-danger">{errors.email.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="signin-password">Password</Label>
         <Input id="signin-password" type="password" placeholder="••••••" {...register("password")} />
-        {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+        {errors.password && <p className="text-sm text-danger">{errors.password.message}</p>}
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
       </Button>
       {onSwitchToSignUp && (
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-ink-muted">
           Don&apos;t have an account?{" "}
-          <button type="button" onClick={onSwitchToSignUp} className="text-brand hover:underline">
+          <button type="button" onClick={onSwitchToSignUp} className="text-brand-yellow hover:underline">
             Sign up
           </button>
         </p>

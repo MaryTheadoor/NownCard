@@ -25,7 +25,7 @@ export function ThemePicker({ value, onChange, accentColor, onAccentColorChange 
             type="button"
             className={cn(
               "flex-1 rounded-lg border p-3 text-center text-sm transition-colors",
-              value === theme ? "border-brand bg-brand/5 ring-2 ring-brand/20" : "border-gray-200 hover:border-gray-300",
+              value === theme ? "border-brand-yellow bg-brand-yellow/5 ring-2 ring-brand-yellow/20" : "border-line hover:border-accent-blue",
             )}
             onClick={() => onChange(theme)}
           >
@@ -35,14 +35,14 @@ export function ThemePicker({ value, onChange, accentColor, onAccentColorChange 
         ))}
       </div>
       <div className="flex items-center gap-3">
-        <p className="text-sm text-gray-500">Accent color:</p>
+        <p className="text-sm text-ink-muted">Accent color:</p>
         <input
           type="color"
           value={accentColor}
           onChange={(e) => onAccentColorChange(e.target.value)}
           className="h-8 w-8 cursor-pointer rounded border"
         />
-        <span className="text-sm text-gray-500">{accentColor}</span>
+        <span className="text-sm text-ink-muted">{accentColor}</span>
       </div>
     </div>
   );

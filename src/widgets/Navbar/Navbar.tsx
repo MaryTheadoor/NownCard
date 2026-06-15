@@ -19,14 +19,14 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b bg-tile/80 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-            <span className="text-brand">Nown</span>Card
+            <span className="text-brand-yellow">Nown</span>Card
           </Link>
 
           <nav className="hidden items-center gap-4 md:flex">
-            <Link to="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link to="/pricing" className="text-sm font-medium text-ink-muted hover:text-ink">
               Pricing
             </Link>
             {loading ? null : user ? (
@@ -62,7 +62,7 @@ export function Navbar() {
         </div>
 
         {mobileOpen && (
-          <div className="border-t bg-white px-4 pb-4 md:hidden">
+          <div className="border-t bg-tile px-4 pb-4 md:hidden">
             <nav className="flex flex-col gap-3 pt-3">
               <Link to="/pricing" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
                 Pricing
@@ -77,13 +77,13 @@ export function Navbar() {
                       Admin
                     </Link>
                   )}
-                  <button className="text-left text-sm font-medium text-red-500" onClick={handleSignOut}>
+                  <button className="text-left text-sm font-medium text-danger" onClick={handleSignOut}>
                     Sign Out
                   </button>
                 </>
               ) : (
                 <button
-                  className="text-left text-sm font-medium text-brand"
+                  className="text-left text-sm font-medium text-brand-yellow"
                   onClick={() => {
                     setMobileOpen(false);
                     setAuthModalOpen(true);

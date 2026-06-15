@@ -2,9 +2,9 @@ import { cn } from "@/shared/lib/utils/cn";
 import type { PlanTier } from "../api";
 
 const planStyles: Record<PlanTier, string> = {
-  free: "bg-gray-100 text-gray-700",
-  pro: "bg-brand/10 text-brand",
-  business: "bg-purple-100 text-purple-700",
+  free: "bg-tile-soft text-ink-muted",
+  pro: "bg-brand-yellow/10 text-brand-yellow",
+  business: "bg-accent-purple/20 text-accent-purple",
 };
 
 const planLabels: Record<PlanTier, string> = {

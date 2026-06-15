@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
           <h1 className="text-2xl font-bold">Something went wrong</h1>
-          <p className="max-w-md text-gray-500">
+          <p className="max-w-md text-ink-muted">
             An unexpected error occurred. Try refreshing the page.
           </p>
           <Button onClick={() => window.location.reload()}>Refresh Page</Button>

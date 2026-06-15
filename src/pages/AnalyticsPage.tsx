@@ -26,7 +26,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link to="/dashboard" className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+      <Link to="/dashboard" className="mb-6 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink">
         <ArrowLeft className="h-4 w-4" /> Back to Dashboard
       </Link>
 
@@ -36,14 +36,14 @@ export default function AnalyticsPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-brand" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand-yellow" />
         </div>
       ) : (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500">Total Views</CardTitle>
+                <CardTitle className="text-sm font-medium text-ink-muted">Total Views</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{totalViews}</p>
@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500">Total Saves</CardTitle>
+                <CardTitle className="text-sm font-medium text-ink-muted">Total Saves</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{totalSaves}</p>
@@ -64,7 +64,7 @@ export default function AnalyticsPage() {
               <CardTitle>Daily Views & Saves</CardTitle>
             </CardHeader>
             <CardContent>
-              <Suspense fallback={<div className="flex h-72 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div>}>
+              <Suspense fallback={<div className="flex h-72 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-ink-faint" /></div>}>
                 <AnalyticsChart data={data} />
               </Suspense>
             </CardContent>

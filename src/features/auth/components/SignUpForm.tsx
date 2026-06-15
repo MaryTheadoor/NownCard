@@ -50,31 +50,31 @@ export function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
       <div className="space-y-2">
         <Label htmlFor="signup-name">Full Name</Label>
         <Input id="signup-name" placeholder="Jane Doe" {...register("displayName")} />
-        {errors.displayName && <p className="text-sm text-red-500">{errors.displayName.message}</p>}
+        {errors.displayName && <p className="text-sm text-danger">{errors.displayName.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-email">Email</Label>
         <Input id="signup-email" type="email" placeholder="you@example.com" {...register("email")} />
-        {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+        {errors.email && <p className="text-sm text-danger">{errors.email.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-password">Password</Label>
         <Input id="signup-password" type="password" placeholder="••••••" {...register("password")} />
-        {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+        {errors.password && <p className="text-sm text-danger">{errors.password.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-confirm">Confirm Password</Label>
         <Input id="signup-confirm" type="password" placeholder="••••••" {...register("confirmPassword")} />
-        {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
+        {errors.confirmPassword && <p className="text-sm text-danger">{errors.confirmPassword.message}</p>}
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
       </Button>
       {onSwitchToSignIn && (
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-ink-muted">
           Already have an account?{" "}
-          <button type="button" onClick={onSwitchToSignIn} className="text-brand hover:underline">
+          <button type="button" onClick={onSwitchToSignIn} className="text-brand-yellow hover:underline">
             Sign in
           </button>
         </p>

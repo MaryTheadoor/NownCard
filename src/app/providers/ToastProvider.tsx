@@ -85,7 +85,7 @@ function ToastViewport({ children }: { children: ReactNode }) {
 }
 
 const variantStyles: Record<ToastVariant, string> = {
-  default: "border-gray-200 bg-white",
+  default: "border-line bg-tile",
   success: "border-green-500 bg-green-50",
   error: "border-red-500 bg-red-50",
 };

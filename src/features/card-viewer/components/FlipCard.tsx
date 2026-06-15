@@ -77,7 +77,7 @@ export function FlipCard({ card, onFlip, children }: FlipCardProps) {
 
         {/* Back */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl shadow-2xl [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <div className="flex h-full flex-col bg-white p-6">
+          <div className="flex h-full flex-col bg-tile p-6">
             <div className="mb-4 flex items-center gap-3">
               {card.profileImage ? (
                 <img src={card.profileImage} alt="" className="h-12 w-12 rounded-full object-cover" />
@@ -91,40 +91,40 @@ export function FlipCard({ card, onFlip, children }: FlipCardProps) {
                 <p className="font-semibold">
                   {card.firstName} {card.lastName}
                 </p>
-                {card.jobTitle && <p className="text-xs text-gray-500">{card.jobTitle}</p>}
+                {card.jobTitle && <p className="text-xs text-ink-muted">{card.jobTitle}</p>}
               </div>
             </div>
 
-            {card.bio && <p className="mb-4 text-sm text-gray-600">{card.bio}</p>}
+            {card.bio && <p className="mb-4 text-sm text-ink-muted">{card.bio}</p>}
 
             <div className="flex-1 space-y-2 overflow-auto">
               {card.phones.map((p, i) => (
                 <a
                   key={`phone-${i}`}
                   href={`tel:${p.number}`}
-                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-ink hover:bg-tile-soft"
                 >
-                  <span className="text-brand">&#9742;</span>
+                  <span className="text-brand-yellow">&#9742;</span>
                   <span>{p.number}</span>
-                  <span className="text-xs text-gray-400">({p.type})</span>
+                  <span className="text-xs text-ink-faint">({p.type})</span>
                 </a>
               ))}
               {card.emails.map((e, i) => (
                 <a
                   key={`email-${i}`}
                   href={`mailto:${e.address}`}
-                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-ink hover:bg-tile-soft"
                 >
-                  <span className="text-brand">&#9993;</span>
+                  <span className="text-brand-yellow">&#9993;</span>
                   <span className="truncate">{e.address}</span>
                 </a>
               ))}
               {card.addresses.map((a, i) => (
-                <div key={`addr-${i}`} className="flex items-start gap-3 rounded-lg p-2 text-sm text-gray-700">
-                  <span className="text-brand">&#9906;</span>
+                <div key={`addr-${i}`} className="flex items-start gap-3 rounded-lg p-2 text-sm text-ink">
+                  <span className="text-brand-yellow">&#9906;</span>
                   <div>
                     <p className="font-medium">{a.label ?? "Address"}</p>
-                    <p className="text-gray-500">
+                    <p className="text-ink-muted">
                       {[a.street, a.city, a.state, a.postalCode, a.country].filter(Boolean).join(", ")}
                     </p>
                   </div>
@@ -136,15 +136,15 @@ export function FlipCard({ card, onFlip, children }: FlipCardProps) {
                   href={s.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 rounded-lg p-2 text-sm text-ink hover:bg-tile-soft"
                 >
-                  <span className="text-brand">&#128279;</span>
+                  <span className="text-brand-yellow">&#128279;</span>
                   <span>{s.platform}</span>
                 </a>
               ))}
             </div>
 
-            <p className="mt-4 text-center text-xs text-gray-400">Tap to flip back</p>
+            <p className="mt-4 text-center text-xs text-ink-faint">Tap to flip back</p>
 
             {children}
           </div>

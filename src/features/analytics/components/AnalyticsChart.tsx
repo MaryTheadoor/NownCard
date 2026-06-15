@@ -8,7 +8,7 @@ interface AnalyticsChartProps {
 export function AnalyticsChart({ data }: AnalyticsChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center text-gray-400">
+      <div className="flex h-64 items-center justify-center text-ink-faint">
         No analytics data yet. Share your card to start tracking views.
       </div>
     );
@@ -22,12 +22,12 @@ export function AnalyticsChart({ data }: AnalyticsChartProps) {
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--line-soft)" />
           <XAxis dataKey="date" fontSize={12} />
           <YAxis fontSize={12} allowDecimals={false} />
           <Tooltip />
-          <Line type="monotone" dataKey="views" stroke="#c9a278" strokeWidth={2} dot={false} name="Views" />
-          <Line type="monotone" dataKey="saves" stroke="#6b7280" strokeWidth={2} dot={false} name="Saves" />
+          <Line type="monotone" dataKey="views" stroke="var(--brand-yellow)" strokeWidth={2} dot={false} name="Views" />
+          <Line type="monotone" dataKey="saves" stroke="var(--ink-faint)" strokeWidth={2} dot={false} name="Saves" />
         </LineChart>
       </ResponsiveContainer>
     </div>

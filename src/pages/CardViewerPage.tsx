@@ -22,7 +22,7 @@ export default function CardViewerPage() {
   if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-yellow" />
       </div>
     );
   }
@@ -31,7 +31,7 @@ export default function CardViewerPage() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4">
         <h1 className="text-2xl font-bold">Card not found</h1>
-        <p className="text-gray-500">{error ?? "This card doesn't exist or is private."}</p>
+        <p className="text-ink-muted">{error ?? "This card doesn't exist or is private."}</p>
         <Button asChild>
           <Link to="/">
             <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -44,7 +44,7 @@ export default function CardViewerPage() {
   return (
     <div className="flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-lg">
-        <Link to="/" className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+        <Link to="/" className="mb-6 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink">
           <ArrowLeft className="h-4 w-4" /> Back
         </Link>
 
@@ -67,9 +67,9 @@ export default function CardViewerPage() {
         </FlipCard>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-ink-faint">
             Powered by{" "}
-            <Link to="/" className="font-medium text-brand hover:underline">
+            <Link to="/" className="font-medium text-brand-yellow hover:underline">
               NownCard
             </Link>{" "}
             — Create yours free

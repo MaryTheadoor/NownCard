@@ -27,7 +27,7 @@ export function AdminUserTable() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-yellow" />
       </div>
     );
   }
@@ -42,12 +42,12 @@ export function AdminUserTable() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left">
-                <th className="pb-3 font-medium text-gray-500">Email</th>
-                <th className="pb-3 font-medium text-gray-500">Name</th>
-                <th className="pb-3 font-medium text-gray-500">Plan</th>
-                <th className="pb-3 font-medium text-gray-500">Cards</th>
-                <th className="pb-3 font-medium text-gray-500">Admin</th>
-                <th className="pb-3 font-medium text-gray-500">Actions</th>
+                <th className="pb-3 font-medium text-ink-muted">Email</th>
+                <th className="pb-3 font-medium text-ink-muted">Name</th>
+                <th className="pb-3 font-medium text-ink-muted">Plan</th>
+                <th className="pb-3 font-medium text-ink-muted">Cards</th>
+                <th className="pb-3 font-medium text-ink-muted">Admin</th>
+                <th className="pb-3 font-medium text-ink-muted">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -64,7 +64,7 @@ export function AdminUserTable() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="text-red-500 hover:text-red-700"
+                      className="text-danger hover:text-danger-dark"
                       onClick={() => handleDeleteUserCards()}
                     >
                       Delete Cards

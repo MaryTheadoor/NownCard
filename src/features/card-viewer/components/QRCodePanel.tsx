@@ -52,11 +52,11 @@ export function QRCodePanel({ card, cardUrl }: QRCodePanelProps) {
         </Button>
       </div>
 
-      <div ref={qrRef} className="rounded-xl bg-white p-4 shadow-sm">
+      <div ref={qrRef} className="rounded-xl bg-tile p-4 shadow-sm">
         <QRCodeCanvas value={cardUrl} size={200} level="M" fgColor={card.accentColor} />
       </div>
 
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-ink-muted">
         <QrCode className="h-4 w-4" />
         <span>Scan to save this card</span>
       </div>

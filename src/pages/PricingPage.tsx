@@ -48,18 +48,18 @@ export default function PricingPage() {
     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold tracking-tight">Simple, transparent pricing</h2>
-        <p className="mt-4 text-gray-500">Choose the plan that fits your needs.</p>
+        <p className="mt-4 text-ink-muted">Choose the plan that fits your needs.</p>
       </div>
       <div className="mt-12 grid gap-6 sm:grid-cols-3">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`flex flex-col rounded-xl border p-6 ${plan.featured ? "border-brand ring-2 ring-brand/20" : ""}`}
+            className={`flex flex-col rounded-xl border p-6 ${plan.featured ? "border-brand-yellow ring-2 ring-brand-yellow/20" : ""}`}
           >
             <h3 className="text-lg font-semibold">{plan.name}</h3>
             <p className="mt-2">
               <span className="text-3xl font-bold">{plan.price}</span>
-              {plan.period && <span className="text-gray-500">{plan.period}</span>}
+              {plan.period && <span className="text-ink-muted">{plan.period}</span>}
             </p>
             <ul className="mt-6 flex flex-col gap-3">
               {plan.features.map((f) => (

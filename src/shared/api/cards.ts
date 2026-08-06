@@ -6,6 +6,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
   orderBy,
@@ -39,6 +40,7 @@ export interface CreateCardInput {
   accentColor: string;
   profileImage?: string;
   backgroundImage?: string;
+  backBackgroundImage?: string;
   isPublic: boolean;
 }
 
@@ -66,10 +68,12 @@ export async function getCard(cardId: string): Promise<Card | null> {
 }
 
 export async function updateCard(cardId: string, input: UpdateCardInput): Promise<void> {
-  await updateDoc(doc(db, "cards", cardId), {
-    ...input,
-    updatedAt: serverTimestamp(),
-  });
+  const data: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(input)) {
+    data[key] = value === "" ? deleteField() : value
+  }
+  data.updatedAt = serverTimestamp()
+  await updateDoc(doc(db, "cards", cardId), data as any);
 }
 
 export async function deleteCard(cardId: string): Promise<void> {

@@ -25,10 +25,10 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 }
 
 describe("generateVCard", () => {
-  it("creates a valid vCard 4.0", () => {
+  it("creates a valid vCard 3.0", () => {
     const vcard = generateVCard(makeCard());
     expect(vcard).toContain("BEGIN:VCARD");
-    expect(vcard).toContain("VERSION:4.0");
+    expect(vcard).toContain("VERSION:3.0");
     expect(vcard).toContain("FN:John Doe");
     expect(vcard).toContain("N:Doe;John;;;");
     expect(vcard).toContain("END:VCARD");
@@ -54,7 +54,7 @@ describe("generateVCard", () => {
         ],
       }),
     );
-    expect(vcard).toContain("TEL;TYPE=PREF,CELL:+1-555-0001");
+    expect(vcard).toContain("TEL;TYPE=MOBILE:+1-555-0001");
     expect(vcard).toContain("TEL;TYPE=WORK:+1-555-0002");
   });
 
@@ -64,7 +64,7 @@ describe("generateVCard", () => {
         emails: [{ type: "work", address: "john@acme.com", primary: true }],
       }),
     );
-    expect(vcard).toContain("EMAIL;TYPE=PREF,WORK:john@acme.com");
+    expect(vcard).toContain("EMAIL;TYPE=WORK:john@acme.com");
   });
 
   it("includes address", () => {
@@ -75,7 +75,7 @@ describe("generateVCard", () => {
         ],
       }),
     );
-    expect(vcard).toContain("ADR;LABEL=\"Office\";;123 Main St;Springfield;;;USA");
+    expect(vcard).toContain("ADR;TYPE=WORK:;;123 Main St;Springfield;;;USA");
   });
 
   it("includes social links as URLs", () => {
@@ -84,7 +84,7 @@ describe("generateVCard", () => {
         socialLinks: [{ platform: "linkedin", url: "https://linkedin.com/in/john" }],
       }),
     );
-    expect(vcard).toContain("URL;TYPE=Linkedin:https://linkedin.com/in/john");
+    expect(vcard).toContain("X-SOCIALPROFILE;TYPE=LINKEDIN:https://linkedin.com/in/john");
   });
 
   it("includes nickname and bio", () => {

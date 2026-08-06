@@ -47,6 +47,7 @@ export const cardFormSchema = z.object({
   accentColor: z.string(),
   profileImage: z.string().optional(),
   backgroundImage: z.string().optional(),
+  backBackgroundImage: z.string().optional(),
   fontFamily: z.string().optional(),
   fontSizeScale: z.number().optional(),
   customFontUrl: z.string().optional(),

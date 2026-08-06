@@ -73,6 +73,10 @@ export function useGoogleSignIn() {
       return user;
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to sign in with Google";
+      if (message === "Redirecting to Google...") {
+        setLoading(false);
+        return null;
+      }
       setError(message);
       toast({ title: "Google sign in failed", description: message, variant: "error" });
       return null;

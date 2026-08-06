@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Button } from "@/shared/ui/button";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Trash2 } from "lucide-react";
 import { compressImage } from "@/shared/lib/utils/compressImage";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/shared/lib/firebase/storage";
@@ -51,15 +51,28 @@ export function ImageUploader({ label, value, onChange, storagePath, maxSize = 1
     <div className="space-y-2">
       <p className="text-sm font-medium">{label}</p>
       {preview ? (
-        <div className="relative h-32 w-32 overflow-hidden rounded-lg border">
-          <img src={preview} alt={label} className="h-full w-full object-cover" />
-          <button
+        <div className="space-y-2">
+          <div className="relative h-32 w-32 overflow-hidden rounded-lg border">
+            <img src={preview} alt={label} className="h-full w-full object-cover" />
+            <button
+              type="button"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 hover:opacity-100 transition-opacity text-sm"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Change
+            </button>
+          </div>
+          <Button
             type="button"
-            className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 hover:opacity-100 transition-opacity text-sm"
-            onClick={() => fileInputRef.current?.click()}
+            size="xs"
+            variant="ghost"
+            onClick={() => {
+              setPreview(undefined);
+              onChange("");
+            }}
           >
-            Change
-          </button>
+            <Trash2 className="h-3 w-3" /> Remove
+          </Button>
         </div>
       ) : (
         <Button

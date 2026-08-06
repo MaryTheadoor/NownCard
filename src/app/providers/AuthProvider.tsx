@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { onAuthChange, type AuthUser } from "@/shared/lib/firebase/auth";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { onAuthChange, getGoogleRedirectResult, type AuthUser } from "@/shared/lib/firebase/auth";
 import { ensureUser } from "@/shared/api/users";
 import type { User } from "@/shared/api/types";
+import { useToast } from "./ToastProvider";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -21,8 +22,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [plan, setPlan] = useState<User["plan"]>("free");
+  const { toast } = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   useEffect(() => {
+    getGoogleRedirectResult()
+      .then((user) => {
+        if (user) toastRef.current({ title: "Welcome!", description: `Signed in as ${user.email}`, variant: "success" });
+      })
+      .catch(() => {});
+
     const unsubscribe = onAuthChange(async (user) => {
       setAuthUser(user);
       if (user) {

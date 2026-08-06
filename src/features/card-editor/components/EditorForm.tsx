@@ -99,6 +99,9 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
         socialLinks: card.socialLinks ?? [],
         theme: card.theme,
         accentColor: card.accentColor,
+        profileImage: card.profileImage ?? "",
+        backgroundImage: card.backgroundImage ?? "",
+        backBackgroundImage: card.backBackgroundImage ?? "",
         fontFamily: card.fontFamily ?? "",
         fontSizeScale: card.fontSizeScale ?? 1,
         customFontUrl: card.customFontUrl ?? "",
@@ -181,6 +184,7 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
   const accentColor = watch("accentColor");
   const profileImage = watch("profileImage");
   const backgroundImage = watch("backgroundImage");
+  const backBackgroundImage = watch("backBackgroundImage");
   const fontFamily = watch("fontFamily");
   const customFontUrl = watch("customFontUrl");
 
@@ -473,6 +477,19 @@ export function EditorForm({ card, cardId, loading }: EditorFormProps) {
               </div>
             )}
           </div>
+
+          {canUseBackgroundImage() && (
+            <div className="mt-4">
+              <ImageUploader
+                label="Card Back Background Image"
+                value={backBackgroundImage}
+                onChange={(url) => setValue("backBackgroundImage", url)}
+                storagePath="users/{uid}/backgrounds/{timestamp}-{filename}"
+                maxSize={2000}
+              />
+              <p className="mt-1 text-xs text-ink-faint">Optional. Falls back to the main background if not set.</p>
+            </div>
+          )}
         </CardContent>
       </CardUI>
 
